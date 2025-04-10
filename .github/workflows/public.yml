@@ -10,7 +10,6 @@ jobs:
     build:
         runs-on: ubuntu-latest
 
-
         steps:
             - name: Checkout repo
               uses: actions/checkout@v4
@@ -20,15 +19,11 @@ jobs:
               with:
                 java-version: '22'
                 distribution: 'temurin'
+            
+            - name: Login to dockerHub
+              run : docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }} 
 
-            - name: build docker image
-              run: docker build -t hello-docker .
-
-
-
-# docker login         - användarnamn och lösenord till dockerhub -> secret till github Action
-
-# docker build -t ....
-
-
-# docker push
+            - name: build and push docker image
+              run: | 
+                docker build -t hello-docker .
+                docker push hello-docker .
