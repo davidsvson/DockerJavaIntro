@@ -7,20 +7,31 @@ on:
 
 
 jobs: 
-    build:
+    check_branch:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Checkout repo
-              uses: actions/checkout@v4
+            - name: Check branch
+              if: github.base_ref == 'main' && github.head_ref != 'dev' && !startsWith(github.head_ref, 'hotfix-')
+              run: |
+                echo "ERROR: You can only merge to main from dev."
+                exit 1
 
-            - name: Login to Dockerhub 
-              uses: docker/login-action@v3  
-              with: 
-                username: ${{ secrets.DOCKERHUB_USERNAME }}    
-                password: ${{ secrets.DOCKERHUB_TOKEN }}
+    build:
+        needs: check_branch
+        runs-on: ubuntu-latest
+        steps:
 
-            - name: build and push docker image
-              run: | 
-                docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/hello-docker .
-                docker push ${{ secrets.DOCKERHUB_USERNAME }}/hello-docker
+        - name: Checkout repo
+          uses: actions/checkout@v4
+
+        - name: Login to Dockerhub 
+          uses: docker/login-action@v3  
+          with: 
+            username: ${{ secrets.DOCKERHUB_USERNAME }}    
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+        - name: build and push docker image
+          run: | 
+            docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/hello-docker .
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/hello-docker
