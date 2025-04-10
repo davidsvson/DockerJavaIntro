@@ -25,5 +25,5 @@ jobs:
 
             - name: build and push docker image
               run: | 
-                docker build -t hello-docker .
-                docker push hello-docker
+                docker build -t davidsvson/hello-docker .
+                docker push davidsvson/hello-docker
